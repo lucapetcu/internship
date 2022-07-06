@@ -1,14 +1,17 @@
 package com.example.locationapp
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.example.locationapp.databinding.ActivityMenuBinding
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
@@ -30,6 +33,7 @@ class MenuActivity : AppCompatActivity() {
 
 
         binding?.btnshowCurrentLocation?.setOnClickListener {
+            Log.e("Clicked", "Show location button clicked")
             Log.e("Clicked", "Show location button clicked")
             if (isLocationEnabled()) {
                 Log.e("Location", "Location enabled")
@@ -60,26 +64,28 @@ class MenuActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun requestNewLocationData() {
-        val locationRequest = LocationRequest.create().apply {
-            interval = 0
-            fastestInterval = 0
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-            numUpdates = 1
-        }
+//        val mLocationRequest = LocationRequest.create().apply {
+//            interval = 0
+//            fastestInterval = 0
+//            priority = Priority.PRIORITY_HIGH_ACCURACY
+//            numUpdates = 1
+//        }
+        val mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 0
+        mLocationRequest.fastestInterval = 0
+        mLocationRequest.numUpdates = 1
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper())
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
     }
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            val mLastLocation: Location? = locationResult.lastLocation
-            if (mLastLocation == null) {
-                Log.e("Null", "is null")
-            }
+            val mLastLocation: Location ?= locationResult.lastLocation
             latitude = mLastLocation!!.latitude
-            Log.e("Current Latitude", "$latitude")
+            Log.e("Current Latitude ca", "$latitude")
             longitude = mLastLocation.longitude
-            Log.e("Current Longitude", "$longitude")
+            Log.e("Current Longitude ca", "$longitude")
         }
     }
 

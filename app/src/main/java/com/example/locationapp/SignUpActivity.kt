@@ -24,6 +24,16 @@ class SignUpActivity : AppCompatActivity() {
             registerUser()
         }
 
+        binding?.fabRegister?.setOnClickListener {
+            onBackPressed()
+        }
+
+        binding?.btnGoToSignIn?.setOnClickListener{
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
     }
 
     private fun registerUser() {
