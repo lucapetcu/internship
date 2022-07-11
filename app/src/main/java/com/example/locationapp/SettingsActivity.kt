@@ -76,14 +76,14 @@ class SettingsActivity : AppCompatActivity() {
                     return@setOnCheckedChangeListener
                 }
                 //start foreground service here
-//                startService(Intent(this, LocationServiceUpdates::class.java))
-                mService?.requestNewLocationData()
+                val intent = Intent(this, LocationServiceUpdates::class.java)
+                startForegroundService(intent)
             } else {
                 Utils.setButtonState(applicationContext, isChecked)
                 //stop foreground service
-                mService?.removeLocationRequest()
-//                unbindService(mServiceConnection)
-//                stopService(Intent(this, LocationServiceUpdates::class.java))
+                val intent = Intent(this, LocationServiceUpdates::class.java)
+                intent.putExtra("stop", "stop")
+                startForegroundService(intent)
             }
         }
     }
@@ -99,25 +99,25 @@ class SettingsActivity : AppCompatActivity() {
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //start foreground service
-//                bindService(Intent(this, LocationServiceUpdates::class.java),
-//                    mServiceConnection,
-//                    Context.BIND_AUTO_CREATE)
-                mService?.requestNewLocationData()
+                val intent = Intent(this, LocationServiceUpdates::class.java)
+                startForegroundService(intent)
             } else {
                 //permission denied
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        bindService(Intent(this, LocationServiceUpdates::class.java),
-            mServiceConnection,
-            Context.BIND_AUTO_CREATE)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        unbindService(mServiceConnection)
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        bindService(Intent(this, LocationServiceUpdates::class.java),
+//            mServiceConnection,
+//            Context.BIND_AUTO_CREATE)
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        if (isBound) {
+//            unbindService(mServiceConnection)
+//        }
+//    }
 }

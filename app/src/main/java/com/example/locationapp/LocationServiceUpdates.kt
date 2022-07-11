@@ -37,6 +37,7 @@ class LocationServiceUpdates: Service() {
     override fun onBind(intent: Intent?): IBinder? {
         Log.i("in bind", "in on bind")
         stopForeground(true)
+        requestNewLocationData()
         return iBinder
     }
 
@@ -68,20 +69,23 @@ class LocationServiceUpdates: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i("in start", "in on start command")
-        if (intent!!.getBooleanExtra("notification", false)) {
+        if (intent!!.hasExtra("stop") && intent.getStringExtra("stop").equals("stop")) {
             removeLocationRequest()
+            stopForeground(true)
             stopSelf()
+        } else {
+            startForeground(NOTIFICATION_ID, getNotification())
+            requestNewLocationData()
         }
         return START_STICKY
     }
 
-    fun removeLocationRequest() {
+    private fun removeLocationRequest() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback)
-        stopSelf()
     }
 
     @SuppressLint("MissingPermission")
-    fun requestNewLocationData() {
+    private fun requestNewLocationData() {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         val locationRequest = LocationRequest.create()?.apply {
@@ -90,7 +94,7 @@ class LocationServiceUpdates: Service() {
             priority = Priority.PRIORITY_HIGH_ACCURACY
         }
 
-        startService(Intent(applicationContext, LocationServiceUpdates::class.java))
+        //startService(Intent(applicationContext, LocationServiceUpdates::class.java))
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper())
 
     }
