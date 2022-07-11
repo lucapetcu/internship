@@ -35,46 +35,49 @@ class LocationServiceUpdates: Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
+        Log.i("in bind", "in on bind")
+        stopForeground(true)
         return iBinder
     }
 
     override fun onRebind(intent: Intent?) {
+        Log.i("in bind", "in on rebind")
         stopForeground(true)
         super.onRebind(intent)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        startForeground(NOTIFICATION_ID, generateForegroundNotifications())
+        Log.i("in bind", "in on unbind")
+        startForeground(NOTIFICATION_ID, getNotification())
         return true
     }
 
 
     override fun onCreate() {
+        Log.i("On create", "in on create")
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = getSystemService(NotificationManager::class.java)
+            val notificationManager = getSystemService(NotificationManager::class.java) as NotificationManager
             val notificationChannel = NotificationChannel(CHANNEL_ID, "Foreground service",
-                NotificationManager.IMPORTANCE_HIGH)
+                NotificationManager.IMPORTANCE_DEFAULT)
 
             notificationManager.createNotificationChannel(notificationChannel)
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action != null && intent.action.equals("stop")) {
+        Log.i("in start", "in on start command")
+        if (intent!!.getBooleanExtra("notification", false)) {
             removeLocationRequest()
-            stopForeground(true)
             stopSelf()
-        } else {
-            generateForegroundNotifications()
         }
-
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     fun removeLocationRequest() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback)
+        stopSelf()
     }
 
     @SuppressLint("MissingPermission")
@@ -87,26 +90,29 @@ class LocationServiceUpdates: Service() {
             priority = Priority.PRIORITY_HIGH_ACCURACY
         }
 
-
+        startService(Intent(applicationContext, LocationServiceUpdates::class.java))
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper())
 
     }
 
-    private fun generateForegroundNotifications(): Notification {
+    private fun getNotification(): Notification {
         val intent = Intent(this, SettingsActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        intent.putExtra("notification", true)
+        val pendingIntent = PendingIntent.getActivity(this, 0,
+            intent, PendingIntent.FLAG_IMMUTABLE)
 
-        val notificationBuilder = NotificationCompat.Builder(this)
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
         notificationBuilder.setContentTitle("This is the title")
             .setContentText("This is the text")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setWhen(System.currentTimeMillis())
-            .setOngoing(true)
             .setContentIntent(pendingIntent)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder.setChannelId(CHANNEL_ID)
-        }
         return notificationBuilder.build()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("in destroy", "in on destroy")
+        removeLocationRequest()
     }
 
     inner class LocalBinder : Binder() {

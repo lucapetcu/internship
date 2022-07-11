@@ -76,18 +76,35 @@ class SettingsActivity : AppCompatActivity() {
                     return@setOnCheckedChangeListener
                 }
                 //start foreground service here
-                //startService(Intent(this, LocationServiceUpdates::class.java))
-                //startForegroundService(Intent(this, LocationServiceUpdates::class.java))
-                if (isBound) {
-                    mService?.requestNewLocationData()
-                }
+//                startService(Intent(this, LocationServiceUpdates::class.java))
+                mService?.requestNewLocationData()
             } else {
                 Utils.setButtonState(applicationContext, isChecked)
                 //stop foreground service
-//                val intent = Intent(this, LocationServiceUpdates::class.java)
-//                intent.action = "stop"
-//                startService(intent)
                 mService?.removeLocationRequest()
+//                unbindService(mServiceConnection)
+//                stopService(Intent(this, LocationServiceUpdates::class.java))
+            }
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //start foreground service
+//                bindService(Intent(this, LocationServiceUpdates::class.java),
+//                    mServiceConnection,
+//                    Context.BIND_AUTO_CREATE)
+                mService?.requestNewLocationData()
+            } else {
+                //permission denied
             }
         }
     }
@@ -102,25 +119,5 @@ class SettingsActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         unbindService(mServiceConnection)
-        isBound = false
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //start foreground service
-                //startService(Intent(this, LocationServiceUpdates::class.java))
-                //startForegroundService(Intent(this, LocationServiceUpdates::class.java))
-                mService?.requestNewLocationData()
-            } else {
-                //permission denied
-            }
-        }
     }
 }
