@@ -26,7 +26,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCu7tg4o2o7Do44fPoqTCzG_nyxufgVxI0" />
 
-        <service android:name=".LocationServiceUpdates">
+        <service android:name=".LocationServiceUpdates"
+            android:foregroundServiceType="location">
         </service>
 
         <activity

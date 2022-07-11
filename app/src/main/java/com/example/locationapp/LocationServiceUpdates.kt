@@ -110,6 +110,8 @@ class LocationServiceUpdates: Service() {
             .setContentText("This is the text")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setSmallIcon(R.drawable.location)
         return notificationBuilder.build()
     }
 

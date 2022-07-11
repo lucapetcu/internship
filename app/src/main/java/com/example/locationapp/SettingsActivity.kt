@@ -83,7 +83,7 @@ class SettingsActivity : AppCompatActivity() {
                 //stop foreground service
                 val intent = Intent(this, LocationServiceUpdates::class.java)
                 intent.putExtra("stop", "stop")
-                startForegroundService(intent)
+                stopService(intent)
             }
         }
     }
