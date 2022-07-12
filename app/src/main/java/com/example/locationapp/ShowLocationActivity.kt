@@ -4,13 +4,17 @@ package com.example.locationapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -50,7 +54,6 @@ class ShowLocationActivity : AppCompatActivity(), OnMapReadyCallback {
             // for ActivityCompat#requestPermissions for more details.
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 //show an alert dialog
-                Log.i("Alert dialog location", "should show an alert dialog here...")
                 ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     LOCATION_REQUEST_CODE)
@@ -81,6 +84,9 @@ class ShowLocationActivity : AppCompatActivity(), OnMapReadyCallback {
                 supportMapFragment.getMapAsync(this)
             } else {
                 //Permission denied
+                Toast.makeText(this,
+                    "Oups, you didn't allow permission for the app to run. Go to settings and turn them on",
+                    Toast.LENGTH_LONG).show()
             }
         }
     }

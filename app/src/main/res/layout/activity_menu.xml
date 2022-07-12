@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0c82c8"
+    android:background="@color/white"
+    android:paddingTop="20dp"
     tools:context=".MenuActivity">
 
     <TextView
@@ -17,15 +18,16 @@
         android:textSize="20sp"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="30dp"
-        android:textColor="@color/white"/>
+        android:textColor="@color/black"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_margin="20dp"
             app:cardCornerRadius="20dp"
@@ -41,7 +43,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:src="@drawable/location"
-                    android:paddingBottom="5dp"/>
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:background="#F3F3F3"/>
                 <Button
                     android:id="@+id/btnshowCurrentLocation"
                     android:layout_width="match_parent"
@@ -57,7 +61,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:layout_width="120dp"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_margin="20dp"
             app:cardCornerRadius="20dp"
@@ -73,11 +77,12 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/setting"
                     android:paddingTop="5dp"
-                    android:paddingBottom="16dp"/>
+                    android:paddingBottom="16dp"
+                    android:background="#F3F3F3"/>
                 <Button
                     android:id="@+id/btnSettings"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="69dp"
                     android:background="@drawable/menu_button"
                     app:backgroundTint="@null"
                     android:gravity="center"
@@ -98,8 +103,8 @@
         app:cardCornerRadius="20dp"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginStart="35dp"
         >
 
         <LinearLayout
@@ -112,7 +117,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:src="@drawable/logout"
-                android:paddingBottom="5dp"/>
+                android:paddingBottom="5dp"
+                android:background="#F3F3F3"/>
 
             <Button
                 android:id="@+id/btnLogout"

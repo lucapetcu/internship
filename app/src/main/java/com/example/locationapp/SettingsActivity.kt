@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.example.locationapp.databinding.ActivitySettingsBinding
@@ -103,21 +104,10 @@ class SettingsActivity : AppCompatActivity() {
                 startForegroundService(intent)
             } else {
                 //permission denied
+                Toast.makeText(this,
+                    "Oups, you didn't allow permission for the app to run. Go to settings and turn them on",
+                    Toast.LENGTH_LONG).show()
             }
         }
     }
-
-//    override fun onStart() {
-//        super.onStart()
-//        bindService(Intent(this, LocationServiceUpdates::class.java),
-//            mServiceConnection,
-//            Context.BIND_AUTO_CREATE)
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        if (isBound) {
-//            unbindService(mServiceConnection)
-//        }
-//    }
 }

@@ -94,7 +94,6 @@ class LocationServiceUpdates: Service() {
             priority = Priority.PRIORITY_HIGH_ACCURACY
         }
 
-        //startService(Intent(applicationContext, LocationServiceUpdates::class.java))
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper())
 
     }
@@ -106,8 +105,8 @@ class LocationServiceUpdates: Service() {
             intent, PendingIntent.FLAG_IMMUTABLE)
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-        notificationBuilder.setContentTitle("This is the title")
-            .setContentText("This is the text")
+        notificationBuilder.setContentTitle("LocationApp")
+            .setContentText("Foreground service is running")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)

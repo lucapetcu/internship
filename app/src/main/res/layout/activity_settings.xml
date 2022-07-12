@@ -5,16 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:background="#0c82c8"
+    android:background="@color/white"
     tools:context=".SettingsActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SETTINGS MENU"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"
+        android:textSize="20sp"
+        android:layout_marginBottom="30dp"
+        android:textColor="@color/black"/>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="6dp"
         android:layout_gravity="center"
-        android:layout_margin="10dp">
+        android:layout_margin="20dp"
+        app:cardBackgroundColor="#F3F3F3">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,6 +43,7 @@
                 app:boxCornerRadiusTopEnd="40dp"
                 app:boxCornerRadiusBottomStart="40dp"
                 app:boxCornerRadiusTopStart="40dp"
+                app:boxBackgroundColor="@color/white"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -54,6 +66,7 @@
                 app:boxCornerRadiusTopEnd="40dp"
                 app:boxCornerRadiusBottomStart="40dp"
                 app:boxCornerRadiusTopStart="40dp"
+                app:boxBackgroundColor="@color/white"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -76,30 +89,25 @@
                     android:layout_height="wrap_content"
                     android:text="Turn service on or off"
                     android:textSize="20sp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
                     />
 
                 <Switch
                     android:id="@+id/toggleSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:textOn="ON"
                     android:textOff="OFF"
+
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/btnApplySettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="APPLY SETTINGS"
-                android:gravity="center"
-                android:visibility="invisible"
-                />
 
         </LinearLayout>
 
