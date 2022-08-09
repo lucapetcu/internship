@@ -6,10 +6,15 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.locationapp.databinding.ActivitySignUpBinding
+import com.example.locationapp.models.UserModel
+import com.example.locationapp.models.UserResponse
+import com.example.locationapp.network.UserService
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import retrofit2.*
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -42,23 +47,49 @@ class SignUpActivity : AppCompatActivity() {
             && binding?.getPassword?.text?.isNotEmpty() == true) {
             val email = binding?.getEmail?.text.toString()
             val password = binding?.getPassword?.text.toString()
-            //Toast.makeText(this, "$email and $password", Toast.LENGTH_SHORT).show()
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
                     task: Task<AuthResult> ->
                         if (task.isSuccessful) {
                             val user: FirebaseUser = task.result!!.user!!
                             Toast.makeText(this, "Registered new account", Toast.LENGTH_SHORT).show()
-                            //FirebaseAuth.getInstance().signOut()
+
+                            //send POST request here in order to store user credentials on the server
+                            val name: String = binding?.getName?.text.toString();
+                            postUserToServer(email, name, FirebaseAuth.getInstance().currentUser!!.uid)
+
                             val intent = Intent(this, MenuActivity::class.java)
                             startActivity(intent)
                             finish()
                         } else {
                             Log.e("register User", "Error registering user")
                         }
-
                 }
         }
+    }
+
+    private fun postUserToServer(email: String, name: String, token: String) {
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:3000")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val userService: UserService = retrofit.create(UserService::class.java)
+
+        val newUser = UserModel(token, email, name)
+
+        val call: Call<UserResponse> = userService.postUser(newUser)
+
+        call.enqueue(object : Callback<UserResponse>{
+            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+                val userResponse: UserResponse = response.body()!!
+                Log.i("Response result", "$userResponse")
+            }
+
+            override fun onFailure(call: Call<UserResponse>, t: Throwable) {
+                Log.e("retrofit", "error " + t.message)
+            }
+        });
     }
 
 }

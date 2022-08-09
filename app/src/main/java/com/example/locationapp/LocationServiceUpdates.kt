@@ -11,7 +11,13 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.locationapp.models.CoordinatesModel
+import com.example.locationapp.models.CoordinatesResponse
+import com.example.locationapp.network.LocationService
 import com.google.android.gms.location.*
+import com.google.firebase.auth.FirebaseAuth
+import retrofit2.*
+import retrofit2.converter.gson.GsonConverterFactory
 import java.security.AccessController.getContext
 import java.util.*
 
@@ -31,7 +37,36 @@ class LocationServiceUpdates: Service() {
             Log.i("service_lat", "$latitude")
             val longitude = mLastLocation.longitude
             Log.i("service_log", "$longitude")
+            //send coordinates updates here
+            sendCoordinatesToServer(FirebaseAuth.getInstance().currentUser!!.uid, longitude, latitude)
         }
+    }
+
+    private fun sendCoordinatesToServer(token: String, longitude: Double, latitude: Double) {
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:3000")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val locationService: LocationService = retrofit.create(LocationService::class.java)
+
+        val newCoordinates = CoordinatesModel(token, longitude, latitude)
+
+        val call: Call<CoordinatesResponse> = locationService.sendCoordinates(newCoordinates)
+
+        call.enqueue(object : Callback<CoordinatesResponse>{
+            override fun onResponse(
+                call: Call<CoordinatesResponse>,
+                response: Response<CoordinatesResponse>
+            ) {
+                val coordResponse = response.body()!!
+                Log.i("Response result coord", "$coordResponse")
+            }
+
+            override fun onFailure(call: Call<CoordinatesResponse>, t: Throwable) {
+                Log.e("retrofit coord", "error " + t.message)
+            }
+        })
     }
 
     override fun onBind(intent: Intent?): IBinder? {
