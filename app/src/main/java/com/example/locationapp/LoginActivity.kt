@@ -43,12 +43,11 @@ class LoginActivity : AppCompatActivity() {
                 .addOnCompleteListener {
                 task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Signed in", Toast.LENGTH_LONG).show()
                         val intent = Intent(this, MenuActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {
-                        Log.e("error sign in", "Error signing user in")
+                        Log.e("error sign in", "Error signing user in" + task.exception)
                     }
             }
         }

@@ -2,7 +2,6 @@ package com.example.locationapp
 
 import android.Manifest
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
@@ -15,7 +14,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.example.locationapp.databinding.ActivitySettingsBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.example.locationapp.services.LocationServiceUpdates
 
 class SettingsActivity : AppCompatActivity() {
     private var binding: ActivitySettingsBinding? = null
@@ -56,6 +55,7 @@ class SettingsActivity : AppCompatActivity() {
 
 
         binding?.toggleSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            binding?.toggleSwitch?.isChecked = isChecked
             if (isChecked) {
                 Utils.setPreferenceInterval(applicationContext, binding?.setInterval?.text.toString().toLong())
                 Utils.setPreferenceFastestInterval(applicationContext, binding?.setFastestInterval?.text.toString().toLong())
@@ -105,7 +105,7 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 //permission denied
                 Toast.makeText(this,
-                    "Oups, you didn't allow permission for the app to run. Go to settings and turn them on",
+                    "Ups, you didn't allow permission for the app to run. Go to settings and turn them on",
                     Toast.LENGTH_LONG).show()
             }
         }

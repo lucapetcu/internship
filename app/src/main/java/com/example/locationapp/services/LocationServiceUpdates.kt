@@ -1,9 +1,8 @@
-package com.example.locationapp
+package com.example.locationapp.services
 
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Intent
-import android.content.res.Configuration
 import android.location.Location
 import android.os.Binder
 import android.os.Build
@@ -11,6 +10,9 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.locationapp.R
+import com.example.locationapp.SettingsActivity
+import com.example.locationapp.Utils
 import com.example.locationapp.models.CoordinatesModel
 import com.example.locationapp.models.CoordinatesResponse
 import com.example.locationapp.network.LocationService
@@ -18,8 +20,6 @@ import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
-import java.security.AccessController.getContext
-import java.util.*
 
 class LocationServiceUpdates: Service() {
 

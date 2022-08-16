@@ -6,13 +6,18 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.locationapp.databinding.ActivitySignUpBinding
+import com.example.locationapp.models.DeviceTokenModel
+import com.example.locationapp.models.DeviceTokenResponse
 import com.example.locationapp.models.UserModel
 import com.example.locationapp.models.UserResponse
+import com.example.locationapp.network.SettingsService
 import com.example.locationapp.network.UserService
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -55,8 +60,21 @@ class SignUpActivity : AppCompatActivity() {
                             Toast.makeText(this, "Registered new account", Toast.LENGTH_SHORT).show()
 
                             //send POST request here in order to store user credentials on the server
-                            val name: String = binding?.getName?.text.toString();
+                            val name: String = binding?.getName?.text.toString()
                             postUserToServer(email, name, FirebaseAuth.getInstance().currentUser!!.uid)
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                                OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                                    return@OnCompleteListener
+                                }
+
+                                // Get new FCM registration token
+                                val token = task.result
+
+                                // Send info to server
+                                sendDeviceTokenToServer(token, FirebaseAuth.getInstance().currentUser!!.uid)
+                            })
 
                             val intent = Intent(this, MenuActivity::class.java)
                             startActivity(intent)
@@ -89,7 +107,30 @@ class SignUpActivity : AppCompatActivity() {
             override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                 Log.e("retrofit", "error " + t.message)
             }
-        });
+        })
     }
 
+    private fun sendDeviceTokenToServer(deviceToken: String, userToken: String) {
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:3000")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val settingsService: SettingsService = retrofit.create(SettingsService::class.java)
+
+        val newDeviceToken = DeviceTokenModel(deviceToken, userToken)
+
+        val call: Call<DeviceTokenResponse> = settingsService.sendDeviceToken(newDeviceToken)
+
+        call.enqueue(object : Callback<DeviceTokenResponse>{
+            override fun onResponse(call: Call<DeviceTokenResponse>, response: Response<DeviceTokenResponse>) {
+                val settingsResponse: DeviceTokenResponse = response.body()!!
+                Log.i("Response result", "$settingsResponse")
+            }
+
+            override fun onFailure(call: Call<DeviceTokenResponse>, t: Throwable) {
+                Log.e("retrofit", "error " + t.message)
+            }
+        })
+    }
 }
