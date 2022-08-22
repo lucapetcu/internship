@@ -13,7 +13,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 
 class MenuActivity : AppCompatActivity() {
 
-
     private var binding: ActivityMenuBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +48,10 @@ class MenuActivity : AppCompatActivity() {
             FirebaseAuth.getInstance().signOut()
             finish()
         }
-    }
 
+        binding?.btnListUsers?.setOnClickListener {
+            val intent = Intent(this, UserListActivity::class.java)
+            startActivity(intent)
+        }
+    }
 }
