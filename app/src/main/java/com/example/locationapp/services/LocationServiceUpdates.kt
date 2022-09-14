@@ -4,30 +4,29 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Intent
 import android.location.Location
-import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.locationapp.R
-import com.example.locationapp.SettingsActivity
-import com.example.locationapp.Utils
-import com.example.locationapp.models.CoordinatesModel
-import com.example.locationapp.models.CoordinatesResponse
-import com.example.locationapp.network.LocationService
+import com.example.locationapp.activities.SettingsActivity
+import com.example.locationapp.domain.AppRepository
+import com.example.locationapp.util.Utils
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
-import retrofit2.*
-import retrofit2.converter.gson.GsonConverterFactory
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LocationServiceUpdates: Service() {
+
+    @Inject
+    lateinit var repo: AppRepository
 
     private var CHANNEL_ID: String = "LocationServiceChannel"
     private var NOTIFICATION_ID: Int = 123
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
-
-    private var iBinder: IBinder = LocalBinder()
 
 
     private val mLocationCallback = object : LocationCallback() {
@@ -38,59 +37,16 @@ class LocationServiceUpdates: Service() {
             val longitude = mLastLocation.longitude
             Log.i("service_log", "$longitude")
             //send coordinates updates here
-            sendCoordinatesToServer(FirebaseAuth.getInstance().currentUser!!.uid, longitude, latitude)
+            repo.sendCoordinates(FirebaseAuth.getInstance().currentUser!!.uid, longitude, latitude)
         }
     }
 
-    private fun sendCoordinatesToServer(token: String, longitude: Double, latitude: Double) {
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val locationService: LocationService = retrofit.create(LocationService::class.java)
-
-        val newCoordinates = CoordinatesModel(token, longitude, latitude)
-
-        val call: Call<CoordinatesResponse> = locationService.sendCoordinates(newCoordinates)
-
-        call.enqueue(object : Callback<CoordinatesResponse>{
-            override fun onResponse(
-                call: Call<CoordinatesResponse>,
-                response: Response<CoordinatesResponse>
-            ) {
-                val coordResponse = response.body()!!
-                Log.i("Response result coord", "$coordResponse")
-            }
-
-            override fun onFailure(call: Call<CoordinatesResponse>, t: Throwable) {
-                Log.e("retrofit coord", "error " + t.message)
-            }
-        })
-    }
-
     override fun onBind(intent: Intent?): IBinder? {
-        Log.i("in bind", "in on bind")
-        stopForeground(true)
-        requestNewLocationData()
-        return iBinder
+        return null
     }
-
-    override fun onRebind(intent: Intent?) {
-        Log.i("in bind", "in on rebind")
-        stopForeground(true)
-        super.onRebind(intent)
-    }
-
-    override fun onUnbind(intent: Intent?): Boolean {
-        Log.i("in bind", "in on unbind")
-        startForeground(NOTIFICATION_ID, getNotification())
-        return true
-    }
-
 
     override fun onCreate() {
-        Log.i("On create", "in on create")
+        super.onCreate()
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -103,7 +59,6 @@ class LocationServiceUpdates: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("in start", "in on start command")
         if (intent!!.hasExtra("stop") && intent.getStringExtra("stop").equals("stop")) {
             removeLocationRequest()
             stopForeground(true)
@@ -130,7 +85,6 @@ class LocationServiceUpdates: Service() {
         }
 
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper())
-
     }
 
     private fun getNotification(): Notification {
@@ -151,14 +105,6 @@ class LocationServiceUpdates: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("in destroy", "in on destroy")
         removeLocationRequest()
     }
-
-    inner class LocalBinder : Binder() {
-        fun getService() : LocationServiceUpdates {
-            return this@LocationServiceUpdates
-        }
-    }
-
 }

@@ -4,20 +4,29 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.example.locationapp.Utils
+import com.example.locationapp.util.Utils
+import com.example.locationapp.domain.SettingsModel
+import com.example.locationapp.domain.AppRepository
 import com.example.locationapp.models.DeviceTokenModel
 import com.example.locationapp.models.DeviceTokenResponse
-import com.example.locationapp.network.SettingsService
+import com.example.locationapp.network.SettingsApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsUpdateService: FirebaseMessagingService() {
+
+    @Inject
+    lateinit var repo: AppRepository
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -27,13 +36,13 @@ class SettingsUpdateService: FirebaseMessagingService() {
             if (message.data["id"]!! == "settings") {
                 Utils.setPreferenceInterval(applicationContext, message.data["interval"]!!.toLong())
                 Utils.setPreferenceFastestInterval(applicationContext, message.data["fastest_interval"]!!.toLong())
-                Log.d("FCM service", "From: ${message.from}")
-                Log.d("FCM data", "${message.data["interval"]} " + "${message.data["fastest_interval"]}")
+                repo.insertSettings(
+                    SettingsModel(message.data["interval"]!!.toLong(),
+                        message.data["fastest_interval"]!!.toLong())
+                )
             } else {
-                Log.i("Info", "${message.data["start"]}")
                 if (message.data["start"]!! == "start") {
                     Utils.setButtonState(applicationContext, true)
-                    Log.i("FCM start", "Started service")
                     val intent = Intent(this, LocationServiceUpdates::class.java)
                     startForegroundService(intent)
                 } else {
@@ -58,7 +67,7 @@ class SettingsUpdateService: FirebaseMessagingService() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val settingsService: SettingsService = retrofit.create(SettingsService::class.java)
+        val settingsService: SettingsApi = retrofit.create(SettingsApi::class.java)
 
         val newDeviceToken = DeviceTokenModel(token, FirebaseAuth.getInstance().currentUser!!.uid)
 

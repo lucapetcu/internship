@@ -1,42 +1,29 @@
-package com.example.locationapp
+package com.example.locationapp.activities
 
 import android.Manifest
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.example.locationapp.databinding.ActivitySettingsBinding
 import com.example.locationapp.services.LocationServiceUpdates
+import com.example.locationapp.util.Utils
+import com.example.locationapp.viewmodels.SettingsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
     private var binding: ActivitySettingsBinding? = null
 
-    private var mService: LocationServiceUpdates? = null
-
     private var LOCATION_REQUEST_CODE = 101
-    private var isBound: Boolean = false
 
-    private var mServiceConnection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as LocationServiceUpdates.LocalBinder
-            mService = binder.getService()
-            isBound = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            mService = null
-            isBound = false
-        }
-
-    }
+    private val mViewModel: SettingsViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,15 +31,21 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        if (Utils.getInterval(applicationContext) != -1L) {
-            binding?.setInterval?.setText(Utils.getInterval(applicationContext).toString())
-        }
-        if (Utils.getFastestInterval(applicationContext) != -1L) {
-            binding?.setFastestInterval?.setText(Utils.getFastestInterval(applicationContext).toString())
+//        if (Utils.getInterval(applicationContext) != -1L) {
+//            binding?.setInterval?.setText(Utils.getInterval(applicationContext).toString())
+//        }
+//        if (Utils.getFastestInterval(applicationContext) != -1L) {
+//            binding?.setFastestInterval?.setText(Utils.getFastestInterval(applicationContext).toString())
+//        }
+
+        mViewModel.liveData.observe(this) {
+            if (it != null) {
+                binding?.setInterval?.setText(it.interval.toString())
+                binding?.setFastestInterval?.setText(it.fastestInterval.toString())
+            }
         }
 
         binding?.toggleSwitch?.isChecked = Utils.getButtonState(applicationContext)
-
 
         binding?.toggleSwitch?.setOnCheckedChangeListener { _, isChecked ->
             binding?.toggleSwitch?.isChecked = isChecked

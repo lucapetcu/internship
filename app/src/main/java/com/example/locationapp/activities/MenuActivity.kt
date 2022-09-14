@@ -1,12 +1,12 @@
-package com.example.locationapp
+package com.example.locationapp.activities
 
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import com.example.locationapp.databinding.ActivityMenuBinding
+import com.example.locationapp.util.Utils
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
@@ -31,8 +31,9 @@ class MenuActivity : AppCompatActivity() {
 
             // Log and toast
             Log.i("FCM token", token)
-            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
         })
+
+        Utils.setUsername(applicationContext, FirebaseAuth.getInstance().currentUser!!.uid)
 
         binding?.btnshowCurrentLocation?.setOnClickListener {
             val intent = Intent(this, ShowLocationActivity::class.java)

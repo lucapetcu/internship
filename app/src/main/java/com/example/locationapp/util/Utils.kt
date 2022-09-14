@@ -1,8 +1,7 @@
-package com.example.locationapp
+package com.example.locationapp.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 
 object Utils {
@@ -34,7 +33,7 @@ object Utils {
     fun setUsername(context: Context, content: String) {
         val spFilename: String = FirebaseAuth.getInstance().currentUser?.uid.toString()
         val sharedPreferences: SharedPreferences = context.getSharedPreferences(spFilename, Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("username", FirebaseAuth.getInstance().currentUser.toString()).apply()
+        sharedPreferences.edit().putString("username", content).apply()
     }
 
     fun getUsername(context: Context): String {

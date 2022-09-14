@@ -6,7 +6,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface SettingsService {
+interface SettingsApi {
     @POST("/settings/receive-token")
     fun sendDeviceToken(@Body deviceToken: DeviceTokenModel): Call<DeviceTokenResponse>
 }

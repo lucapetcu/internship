@@ -7,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.locationapp.R
-import com.example.locationapp.ShowUserLocationActivity
+import com.example.locationapp.activities.ShowUserLocationActivity
 import com.example.locationapp.models.User
+import com.example.locationapp.util.Utils
 
 class UserAdapter(private val context: Context,
+                  private val appContext: Context,
                   private var list: ArrayList<User>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.user, parent, false))
@@ -27,6 +28,7 @@ class UserAdapter(private val context: Context,
             holder.llUser.setOnClickListener{
                 val intent = Intent(context, ShowUserLocationActivity::class.java)
                 intent.putExtra("username", user.user_name)
+                Utils.setUsername(appContext, user.user_name)
                 it.context.startActivity(intent)
             }
         }

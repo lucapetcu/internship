@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@color/white"
     android:paddingTop="20dp"
-    tools:context=".MenuActivity">
+    tools:context=".activities.MenuActivity">
 
     <TextView
         android:layout_width="match_parent"
